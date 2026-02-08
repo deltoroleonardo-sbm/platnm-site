@@ -20,6 +20,37 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Waitlist / storing emails
+
+The landing page collects emails via a form and stores them in [Supabase](https://supabase.com).
+
+1. Create a free project at [supabase.com](https://supabase.com).
+2. In the SQL Editor, run:
+
+```sql
+create table waitlist (
+  id uuid default gen_random_uuid() primary key,
+  email text not null unique,
+  created_at timestamptz default now()
+);
+
+alter table waitlist enable row level security;
+
+create policy "Allow anonymous insert"
+  on waitlist for insert
+  with check (true);
+```
+
+3. In **Settings → API**, copy your project URL and anon key.
+4. Create a `.env.local` file (see `.env.example`) and add:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+5. Restart the dev server. Submissions will show in the Supabase Table Editor under `waitlist`.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
