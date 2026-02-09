@@ -30,7 +30,6 @@ export function WaitlistForm() {
       }
 
       setStatus("success");
-      setMessage("You’re on the list. We’ll be in touch.");
       setEmail("");
     } catch {
       setStatus("error");
@@ -38,37 +37,40 @@ export function WaitlistForm() {
     }
   }
 
+  if (status === "success") {
+    return (
+      <p className="text-[#ABABAB]">
+        you&apos;re in — stay tuned.
+      </p>
+    );
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3 max-w-md mx-auto w-full">
-      <div className="flex flex-col sm:flex-row gap-3">
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="your@email.com"
-          required
-          disabled={status === "loading"}
-          className="flex-1 min-w-0 h-12 px-4 rounded-lg bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-zinc-600 disabled:opacity-60"
-          aria-label="Email address"
-        />
-        <button
-          type="submit"
-          disabled={status === "loading"}
-          className="h-12 px-6 rounded-lg bg-white text-black font-medium hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-white/40 disabled:opacity-60 transition-colors shrink-0"
-        >
-          {status === "loading" ? "…" : "Notify me"}
-        </button>
-      </div>
-      {message && (
-        <p
-          role="alert"
-          className={`text-sm ${
-            status === "success" ? "text-emerald-400" : "text-red-400"
-          }`}
-        >
+    <div className="flex flex-col items-center gap-2 w-full max-w-md mx-auto">
+    <form onSubmit={handleSubmit} className="flex flex-row gap-2 w-full items-center justify-center">
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="name@email.com"
+        required
+        disabled={status === "loading"}
+        className="flex-1 min-w-0 h-12 px-5 rounded-full bg-black border border-white text-white placeholder:text-[#A0A0A0] focus:outline-none disabled:opacity-60"
+        aria-label="Email address"
+      />
+      <button
+        type="submit"
+        disabled={status === "loading"}
+        className="h-12 px-6 rounded-full bg-white text-black font-medium shrink-0 focus:outline-none disabled:opacity-60 hover:bg-white/90 transition-colors"
+      >
+        sign up
+      </button>
+    </form>
+      {message && status === "error" && (
+        <p role="alert" className="text-red-400 text-sm">
           {message}
         </p>
       )}
-    </form>
+    </div>
   );
 }

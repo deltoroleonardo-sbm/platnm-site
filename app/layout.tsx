@@ -1,22 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const benzin = localFont({
+  src: "./fonts/benzin-extra-bold.ttf",
+  variable: "--font-benzin",
 });
 
 export const metadata: Metadata = {
-  title: "PLATNM — Coming Soon",
+  title: "platnm — Coming Soon",
   description: "A new way to share and remember music.",
 };
-
 
 export default function RootLayout({
   children,
@@ -25,9 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${benzin.variable} antialiased`}>
         {children}
       </body>
     </html>
