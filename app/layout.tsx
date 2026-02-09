@@ -8,7 +8,7 @@ const benzin = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "platnm — Coming Soon",
+  title: "platnm",
   description: "A new way to share and remember music.",
 };
 
