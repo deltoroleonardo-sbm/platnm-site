@@ -39,7 +39,7 @@ export function WaitlistForm() {
 
   if (status === "success") {
     return (
-      <p className="text-[#ABABAB]">
+      <p className="text-white text-sm">
         you&apos;re in — stay tuned.
       </p>
     );
