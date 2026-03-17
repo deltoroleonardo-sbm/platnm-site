@@ -10,7 +10,7 @@ type LandingVideoProps = {
 
 export function LandingVideo({ src, onEnded, poster }: LandingVideoProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [needsGesture, setNeedsGesture] = useState(false);
+  const [canEnableSound, setCanEnableSound] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
 
   const canAutoplayUnmuted = useMemo(() => {
@@ -29,10 +29,23 @@ export function LandingVideo({ src, onEnded, poster }: LandingVideoProps) {
 
       try {
         await v.play();
-        setNeedsGesture(false);
+        setCanEnableSound(!withSound);
         setHasStarted(true);
       } catch {
-        setNeedsGesture(true);
+        if (withSound) {
+          // Fallback: autoplay muted is typically allowed, then let the user enable sound.
+          v.muted = true;
+          try {
+            await v.play();
+            setHasStarted(true);
+            setCanEnableSound(true);
+          } catch {
+            // If even muted autoplay fails, we still show a button to start playback.
+            setCanEnableSound(true);
+          }
+        } else {
+          setCanEnableSound(true);
+        }
       }
     },
     []
@@ -47,39 +60,37 @@ export function LandingVideo({ src, onEnded, poster }: LandingVideoProps) {
     <div className="relative h-[100svh] w-full bg-black overflow-hidden">
       <video
         ref={videoRef}
-        className="h-full w-full object-cover"
+        className="h-full w-full object-contain sm:object-cover object-top"
         src={src}
         poster={poster}
         playsInline
         controls={false}
-        muted={false}
         preload="auto"
         onEnded={onEnded}
         onPlay={() => setHasStarted(true)}
       />
 
-      {needsGesture && (
+      {canEnableSound && (
         <button
           type="button"
           onClick={() => void tryStart({ withSound: true })}
-          className="absolute inset-0 flex items-center justify-center bg-black/40 px-6 text-center"
-          aria-label="Play video with sound"
+          className="absolute right-4 top-4 rounded-full border border-white/70 bg-black/40 px-4 py-2 text-sm text-white hover:bg-black/55 transition-colors"
+          aria-label="Enable sound"
         >
-          <span className="inline-flex items-center justify-center rounded-full bg-white text-black h-12 px-6 font-medium hover:bg-white/90 transition-colors">
-            tap to play with sound
-          </span>
+          enable sound
         </button>
       )}
 
-      {!needsGesture && hasStarted && (
+      {hasStarted && (
         <button
           type="button"
           onClick={() => {
             const v = videoRef.current;
             if (!v) return;
             v.muted = !v.muted;
+            setCanEnableSound(v.muted);
           }}
-          className="absolute right-4 top-4 rounded-full border border-white/70 bg-black/40 px-4 py-2 text-sm text-white hover:bg-black/55 transition-colors"
+          className="absolute left-4 top-4 rounded-full border border-white/70 bg-black/40 px-4 py-2 text-sm text-white hover:bg-black/55 transition-colors"
           aria-label="Toggle sound"
         >
           sound
