@@ -6,8 +6,7 @@ import { LandingVideo } from "@/app/components/LandingVideo";
 
 export function LandingPageClient() {
   const detailsId = "details";
-  const appStoreUrl =
-    process.env.NEXT_PUBLIC_APP_STORE_URL?.trim() || "https://apps.apple.com/";
+  const appStoreUrl = "https://apps.apple.com/us/app/platnm/id6758260157";
 
   const handleEnded = useCallback(() => {
     document.getElementById(detailsId)?.scrollIntoView({
@@ -31,7 +30,7 @@ export function LandingPageClient() {
             <a
               href={appStoreUrl}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="h-12 px-6 rounded-full bg-white text-black font-medium inline-flex items-center justify-center hover:bg-white/90 transition-colors"
             >
               download on the app store

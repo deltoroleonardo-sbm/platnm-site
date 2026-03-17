@@ -10,8 +10,8 @@ type LandingVideoProps = {
 
 export function LandingVideo({ src, onEnded, poster }: LandingVideoProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [canEnableSound, setCanEnableSound] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
 
   const canAutoplayUnmuted = useMemo(() => {
     if (typeof window === "undefined") return false;
@@ -29,8 +29,8 @@ export function LandingVideo({ src, onEnded, poster }: LandingVideoProps) {
 
       try {
         await v.play();
-        setCanEnableSound(!withSound);
         setHasStarted(true);
+        setIsMuted(v.muted);
       } catch {
         if (withSound) {
           // Fallback: autoplay muted is typically allowed, then let the user enable sound.
@@ -38,13 +38,13 @@ export function LandingVideo({ src, onEnded, poster }: LandingVideoProps) {
           try {
             await v.play();
             setHasStarted(true);
-            setCanEnableSound(true);
+            setIsMuted(true);
           } catch {
             // If even muted autoplay fails, we still show a button to start playback.
-            setCanEnableSound(true);
+            setIsMuted(true);
           }
         } else {
-          setCanEnableSound(true);
+          setIsMuted(true);
         }
       }
     },
@@ -60,7 +60,7 @@ export function LandingVideo({ src, onEnded, poster }: LandingVideoProps) {
     <div className="relative h-[100svh] w-full bg-black overflow-hidden">
       <video
         ref={videoRef}
-        className="h-full w-full object-contain sm:object-cover object-top"
+        className="h-full w-full object-contain sm:object-cover"
         src={src}
         poster={poster}
         playsInline
@@ -70,32 +70,57 @@ export function LandingVideo({ src, onEnded, poster }: LandingVideoProps) {
         onPlay={() => setHasStarted(true)}
       />
 
-      {canEnableSound && (
-        <button
-          type="button"
-          onClick={() => void tryStart({ withSound: true })}
-          className="absolute right-4 top-4 rounded-full border border-white/70 bg-black/40 px-4 py-2 text-sm text-white hover:bg-black/55 transition-colors"
-          aria-label="Enable sound"
-        >
-          enable sound
-        </button>
-      )}
+      <button
+        type="button"
+        onClick={() => {
+          const v = videoRef.current;
+          if (!v) return;
 
-      {hasStarted && (
-        <button
-          type="button"
-          onClick={() => {
-            const v = videoRef.current;
-            if (!v) return;
-            v.muted = !v.muted;
-            setCanEnableSound(v.muted);
-          }}
-          className="absolute left-4 top-4 rounded-full border border-white/70 bg-black/40 px-4 py-2 text-sm text-white hover:bg-black/55 transition-colors"
-          aria-label="Toggle sound"
-        >
-          sound
-        </button>
-      )}
+          if (!hasStarted) {
+            void tryStart({ withSound: true });
+            return;
+          }
+
+          v.muted = !v.muted;
+          setIsMuted(v.muted);
+        }}
+        className="absolute right-4 top-4 rounded-full border border-white/70 bg-black/40 p-2 text-white hover:bg-black/55 transition-colors"
+        aria-label={isMuted ? "Unmute" : "Mute"}
+      >
+        {isMuted ? (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-5 w-5"
+            aria-hidden="true"
+          >
+            <path d="M11 5 6 9H2v6h4l5 4V5Z" />
+            <path d="m23 9-6 6" />
+            <path d="m17 9 6 6" />
+          </svg>
+        ) : (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="h-5 w-5"
+            aria-hidden="true"
+          >
+            <path d="M11 5 6 9H2v6h4l5 4V5Z" />
+            <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+            <path d="M19 5a10 10 0 0 1 0 14" />
+          </svg>
+        )}
+      </button>
     </div>
   );
 }
